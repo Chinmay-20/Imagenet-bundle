@@ -1,0 +1,97 @@
+object detection has 3 primary goals 
+1) a list of bounding box : (x,y) for each object in an image 
+2) class label associated with each bounding box
+3) conffidence score associated with each bounding box and class label.
+
+what we will do is develop end-to-end deep learning based object detector where we input an image to network and obtain bounding boxes and class labels for output
+
+in object detection we have to compute intersection of union 
+intersection of union = area of overlap / area of union
+
+for evaluating object detector performance we use INTERSECTION OVER UNION(IoU) metric
+it is also used for HOG+Linear SVM, Faster R-CNN, SSD, YOLO. 
+actual algorithm used to generate predicted bounding box does not matter
+
+for IoU to evaluate any object detector we need
+1)ground truth bounding boxes ie handlabeled bounding boxes in testing set wwhich specifies where in an image our object is
+2) predicted bounding box from our model
+3) for recall and precision we need ground truth and predicted labels
+
+for training our own object detector we need dataset and that should be divided into 2 groups 
+1) training set 2) testing set for evaluating
+
+and each set will consist of : actual image themselves and bounding boxes associated with object in image bounding box are simply (x,y) coordinates of object in image and bounding box are hand labeled SO they are ground truth
+
+ GOAL IS TO TAKE TRAINING IMAGEES + BOUNDING BOXES , CONSTRUCT AN OBJECT DETECTOR AND EVALUATE PERFORMANCE ON TESTING IMAGE
+ 
+an IoU sccore >0.5 is normally cconsidered a good score
+
+reason for using IoU
+its difficult that coordinate of predicted bounding box and groundtruth will match exactly becuase parameters such as layer used for feature extraction, anchor placement, loss function.
+because coordinate do not match exactly we define evaluation metric that rewards predicted bounding boxes for heavily overlapping with GT
+heavily overlap will have higher score
+
+for implementing IoU refer http://pyimg.co/ag4o5
+
+in OD IoU is our precision and to compute accuracy per class and across all classes in dataset we compute mean Average Precision.
+to evaluate mAP we compute average IoU for all N classes then we take average of these N averages
+mAP value shoulb be around 0.5
+
+
+Steps in R-CNN
+1) input an image
+2)extract regions proposals(region of image that potentially contains objects) using an algorithm such as selective search
+selective search intelligently examines input image at various scales & locations, reducing total number of proposal ROIthat will be sent to netowrk for classification
+selecttive search as smart sliding window and image pyramid algorithm
+we crop each proposal locations and apply transfer learning via feature extraction
+3) use transfer learning specially feature extraction to compute features for each proposal using pre-trained CNN
+instead of obtaining final predictions from CNN we utilize feature extraction to learn more discriminating patterns from these CNN features
+4) classify each proposal using extracted features with SVM
+we train series of SVMs on top of these extracted features for each class.
+
+This approach worked so well because of robust, discriminative features learned by CNN
+
+R-CNN was slow and we're not actually learning to localize and we are only classifying ROI once its determined
+
+Fast R-CNN similar to R-CNN still utilized selective search to obtain region proposals but new thing was Region of Interest pooling
+
+we apply CNN to image and extract feature map from it using network
+ROI poolinig works by extracting fixed size window from feature map 
+then passing it into set of fully connected layers to obtain output label for ROI
+
+ROI POOLING OPERATES OVER FEATURE MAP EXTRACTED FROM CNN AND EXTRACTS A FIXED-SIZE WINDOW FROM IT.
+
+BENEFITS : network is end-to-end trainable	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
